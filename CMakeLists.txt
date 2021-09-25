@@ -6,14 +6,17 @@ set(PROJECT_VESRION 0.0.${PATCH_VERSION})
 project(helloworld VERSION ${PROJECT_VESRION})
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+find_package(GTest REQUIRED)
+find_package(Threads REQUIRED)
 
 configure_file(version.h.in version.h)
 
 add_executable(helloworld_cli main.cpp)
 add_library(helloworld lib.cpp)
 add_executable(test_version test_version.cpp)
+add_executable(gtest_version gtest_version.cpp)
 
-set_target_properties(helloworld_cli helloworld test_version PROPERTIES
+set_target_properties(helloworld_cli helloworld test_version gtest_version PROPERTIES
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
 )
@@ -25,11 +28,22 @@ set_target_properties(test_version PROPERTIES
     INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
 
+set_target_properties(gtest_version PROPERTIES
+    INCLUDE_DIRECTORIES ${GTEST_INCLUDE_DIRS}
+)
+
+
 target_link_libraries(helloworld_cli PRIVATE
     helloworld
 )
 target_link_libraries(test_version
     ${Boost_LIBRARIES}
+    helloworld
+)
+
+target_link_libraries(gtest_version
+    ${GTEST_LIBRARIES}
+    Threads::Threads
     helloworld
 )
 
